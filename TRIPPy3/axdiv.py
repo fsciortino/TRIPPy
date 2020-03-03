@@ -1,9 +1,11 @@
-import TRIPPy.surface
-import TRIPPy
-import AXUV
+from __future__ import print_function
+from __future__ import absolute_import
+import TRIPPy3.surface
+import TRIPPy3 as TRIPPy
+from . import AXUV
 import scipy
-import eqtools
-#import TRIPPy.plot.mayaplot
+import eqtools3 as eqtools
+
 
 #data I found from /home/hutch/work/bolo/ this is horrid and there IS NO DOCUMENTATION
 # this is all I've been able to glean JESUS FUCKING CHRIST
@@ -80,7 +82,7 @@ def volweight(num,numsplit=(3,3), factor=1, fact2=None, eq='/home/ian/python/g11
 
     out = scipy.zeros((len(rgrid)-1,len(zgrid)-1))
 
-    print(dmbolo2[0],dmbolo2[1])
+    print((dmbolo2[0],dmbolo2[1]))
 
     for i in surfs:
         for j in i:

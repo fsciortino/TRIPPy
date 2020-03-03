@@ -1,7 +1,11 @@
-import plasma
-import beam
-import _beam
-import geometry
+from __future__ import division
+from __future__ import absolute_import
+from builtins import range
+from past.utils import old_div
+from . import plasma
+from . import beam
+from . import _beam
+from . import geometry
 import scipy
 import scipy.interpolate
 import scipy.integrate
@@ -76,7 +80,7 @@ def fluxFourierSens(beam, plasmameth, centermeth, time, points, mcos=[0], msin=[
         # to geometry.Vec improper vectorization strategy in t2 causes the use
         # of a for loop
         angle = scipy.zeros(mapped.shape)
-        for i in xrange(len(time)):
+        for i in range(len(time)):
             pt0 = centermeth(time[i])
             angle[i] = temp.t2(pt0[0],pt0[1])
         
@@ -120,7 +124,7 @@ def fluxFourierSens(beam, plasmameth, centermeth, time, points, mcos=[0], msin=[
         output = scipy.zeros((len(time),len(beam),length*len(mcos+msin)))
 
         #this for loop should be parallellized (well compartmentalized)
-        for i in xrange(len(beam)):
+        for i in range(len(beam)):
             output[:,i,:] = fluxFourierSens(beam[i],
                                             plasmameth,
                                             centermeth,
@@ -171,7 +175,7 @@ def fluxFourierSensRho(beams,plasma,time,points,mcos=[0],msin=[],ds=1e-3,meth='p
     # initialize output array of sensitivities
     output = scipy.zeros((len(time),len(beams),len(points)))
 
-    for i in xrange(len(beams)):
+    for i in range(len(beams)):
         temp = beams[i](scipy.mgrid[beams[i].norm.s[-2]:beams[i].norm.s[-1]:step])
         mapped = plasma.eq.rz2rho(meth,
                                   temp.r0(),
@@ -232,7 +236,7 @@ def _bessel_fourier_kernel(theta,m,zero,rho):
     """ Depreciated, older, slower, version. See besselFourierKernel"""
     return scipy.cos(m*theta)*scipy.sin(zero*(scipy.cos(theta)-rho))
 
-def besselFourierSens(beam, rcent, zcent, rmax, l=range(15), mcos=[0], msin=[], rcond=2e-2):
+def besselFourierSens(beam, rcent, zcent, rmax, l=list(range(15)), mcos=[0], msin=[], rcond=2e-2):
     """Calculates the distance weight matrix for specified fourier components
 
     This function is used directly for poloidal tomography exstensibly for 
@@ -268,7 +272,7 @@ def besselFourierSens(beam, rcent, zcent, rmax, l=range(15), mcos=[0], msin=[], 
     m = scipy.unique(mcos+msin)
     length = len(l)
     zeros = scipy.zeros((len(m),length))
-    for i in xrange(len(m)):
+    for i in range(len(m)):
         zeros[i] = scipy.special.jn_zeros(m[i],zeros.shape[1])
 
     kernel = scipy.zeros((len(m),length))
@@ -282,7 +286,7 @@ def besselFourierSens(beam, rcent, zcent, rmax, l=range(15), mcos=[0], msin=[], 
             output = scipy.zeros((1, length*(len(mcos)+len(msin))))
             rmax = scipy.atleast_1d(rmax)
 
-        for i in xrange(len(rcent)):
+        for i in range(len(rcent)):
             idx = 0
             
             # returns closest approach vector to plasma center mod for NSTX-U
@@ -298,19 +302,19 @@ def besselFourierSens(beam, rcent, zcent, rmax, l=range(15), mcos=[0], msin=[], 
                 rho = 1.0
                 warnings.warn('chord outside of specified designated edge zero emissivity', RuntimeWarning)
             else:
-                rho = temp[0]/rmax[i]
+                rho = old_div(temp[0],rmax[i])
 
-            for j in xrange(len(m)):
-                for k in xrange(length):
+            for j in range(len(m)):
+                for k in range(length):
                     kernel[j, k] = rmax[i]*besselFourierKernel(m[j],
                                                                zeros[j,k],
                                                                rho)
             # fill sens matrix
-            for j in xrange(len(mcos)):
+            for j in range(len(mcos)):
                 output[i, idx*length:(idx+1)*length] = scipy.cos(mcos[j]*temp[2])*kernel[scipy.where(m == mcos[j])]
                 idx += 1
 
-            for j in xrange(len(msin)):     
+            for j in range(len(msin)):     
                 output[i, idx*length:(idx+1)*length] = scipy.sin(msin[j]*temp[2])*kernel[scipy.where(m == msin[j])]
                 idx += 1
                     
@@ -322,7 +326,7 @@ def besselFourierSens(beam, rcent, zcent, rmax, l=range(15), mcos=[0], msin=[], 
                               len(beam),
                               length*len(mcos+msin)))
         
-        for i in xrange(len(beam)):
+        for i in range(len(beam)):
             output[:,i,:] += besselFourierSens(beam[i],
                                                rcent,
                                                zcent,
@@ -334,7 +338,7 @@ def besselFourierSens(beam, rcent, zcent, rmax, l=range(15), mcos=[0], msin=[], 
         return output
 
     
-def bFInvert(beams, bright, rcent, zcent, rmax, l=range(15), mcos=[0], msin=[], zeros=None, plasma=None, rcond=2e-2, out=False):
+def bFInvert(beams, bright, rcent, zcent, rmax, l=list(range(15)), mcos=[0], msin=[], zeros=None, plasma=None, rcond=2e-2, out=False):
     """Bessel/Fourier inversion function for a given center, chords and brightnesses.
 
     This function inverts poloidal brightness data using Bessel/Fourier
@@ -389,8 +393,8 @@ def bFInvert(beams, bright, rcent, zcent, rmax, l=range(15), mcos=[0], msin=[], 
     
     """
     bright = bright*4*scipy.pi
-    for i in xrange(len(bright)):
-        bright[i] = bright[i]/beams[i].etendue
+    for i in range(len(bright)):
+        bright[i] = old_div(bright[i],beams[i].etendue)
     
     if (not plasma is None) and (not zeros is None):
         beams += beam._genBFEdgeZero(plasma, zeros, rcent, zcent)
@@ -398,7 +402,7 @@ def bFInvert(beams, bright, rcent, zcent, rmax, l=range(15), mcos=[0], msin=[], 
     
     sens = besselFourierSens(beams, rcent, zcent, rmax, l=l, mcos=mcos, msin=msin, rcond=rcond)
     output = scipy.zeros((len(sens),len(l)*len(mcos+msin)))
-    for i in xrange(len(sens)):
+    for i in range(len(sens)):
         output[i] = scipy.dot(scipy.linalg.pinv(sens[i],rcond=rcond),bright)
         
     if out:
@@ -412,7 +416,7 @@ def cov(sens):
 def err(emiss, bright, sens, beams, num=None):
     """ returns the error of emiss"""
     temp2 = bright[:]
-    for i in xrange(len(temp2)):
+    for i in range(len(temp2)):
         temp2[i] *= 4*scipy.pi/beams[i].etendue
     temp = scipy.sum((scipy.dot(sens,emiss)[0:len(bright)]-temp2)**2)
     var = cov(sens)
@@ -421,7 +425,7 @@ def err(emiss, bright, sens, beams, num=None):
     else:
         output = scipy.zeros((num,))
     
-    for i in xrange(len(output)):
+    for i in range(len(output)):
         output[i] = var[i,i]
 
     return scipy.sqrt(abs(temp*output/(bright.size-emiss.size)))

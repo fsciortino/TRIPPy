@@ -1,7 +1,11 @@
-import geometry
-import surface
+from __future__ import division
+from __future__ import absolute_import
+from builtins import range
+from past.utils import old_div
+from . import geometry
+from . import surface
 import scipy
-import beam
+from . import beam
 
 def XTOMOchip(temp):
     diodes = 38*[0]
@@ -18,7 +22,7 @@ def XTOMOchip(temp):
                                  vec=Vec)
     return diodes
 
-def XTOMO1(temp, place1=(0.73674,0.,0.46479), place2=(.747,0.,.4947), angle=(0.,-(180.5*scipy.pi/180.),scipy.pi/2.)):
+def XTOMO1(temp, place1=(0.73674,0.,0.46479), place2=(.747,0.,.4947), angle=(0.,-(180.5*scipy.pi/180.),old_div(scipy.pi,2.))):
     # this is the hard part, tree storage values are not done in such a manner
     pos = geometry.Origin(place1,temp,angle=angle)
     area = [1e-3,3e-3]
@@ -69,7 +73,7 @@ def XTOMO1beam(plasma):
 #    return diodes
 #
 
-def XTOMO3(temp, place=(1.0152,0.,0.),angle =(0.,scipy.pi/2.,scipy.pi/2.)):
+def XTOMO3(temp, place=(1.0152,0.,0.),angle =(0.,old_div(scipy.pi,2.),old_div(scipy.pi,2.))):
     # this is the hard part, tree storage values are not done in such a manner
     pos = geometry.Origin(place,temp,angle=angle)
     area = [1e-3,3e-3]
@@ -105,7 +109,7 @@ def XTOMO3beam(plasma):
 #        diodes[-1].redefine(temp)
 #    return diodes
 
-def XTOMO5(temp, place=(.8888,0,-.2794),angle =(0.,.79587,scipy.pi/2.)):
+def XTOMO5(temp, place=(.8888,0,-.2794),angle =(0.,.79587,old_div(scipy.pi,2.))):
     # this is the hard part, tree storage values are not done in such a manner
     pos = geometry.Origin(place,temp,angle=angle)
     area = [1e-3,3e-3]
@@ -125,7 +129,7 @@ def XTOMO5beam(plasma):
     output = beam.multiBeam(temp[:-1],temp[-1])
     traceout = 2*scipy.ones((len(output),),dtype=int)
     traceout[-3:] = 0
-    for i in xrange(len(output)):
+    for i in range(len(output)):
         plasma.trace(output[i],
                      limiter=traceout[i])
     return output

@@ -1,5 +1,6 @@
+from __future__ import absolute_import
 import scipy
-import surface
+from . import surface
 
 
 def pilatus(pt0, ref, vec=None, angle=None, flag=None):

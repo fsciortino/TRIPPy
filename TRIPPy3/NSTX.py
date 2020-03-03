@@ -1,8 +1,11 @@
-import geometry,surface,AXUV
-import beam
+from __future__ import division
+from __future__ import absolute_import
+from past.utils import old_div
+from . import geometry,surface,AXUV
+from . import beam
 import scipy
 
-def diode1(temp,place=(2.0,0,-4e-1), angle=(0,scipy.pi/2,0)):
+def diode1(temp,place=(2.0,0,-4e-1), angle=(0,old_div(scipy.pi,2),0)):
     pos = geometry.Origin(place,temp,angle=angle,flag=False)
     area = [2e-3,.5e-3]#[.5e-4,.5e-3] #[2e-3,.5e-3] set for NSTX rather than NSTXU
     centervec = geometry.Vecx(scipy.array((.815,0,.5))-place)
@@ -24,7 +27,7 @@ def NSTXsightlines(diodefn, plasma):
     plasma.trace(output)
     return output
 
-def diode2(temp,place=(2.0,0,4e-1), angle=(0,scipy.pi/2,0)):
+def diode2(temp,place=(2.0,0,4e-1), angle=(0,old_div(scipy.pi,2),0)):
     pos = geometry.Origin(place,temp,angle=angle,flag=False)
     area = [2e-3,.5e-3]#[.5e-4,.5e-3]
     centervec = geometry.Vecx(scipy.array((.815,0,-.5))-place)
@@ -40,7 +43,7 @@ def diode2(temp,place=(2.0,0,4e-1), angle=(0,scipy.pi/2,0)):
     diodes[-1].redefine(temp)
     return diodes
 
-def diode3(temp,place=(.8,0,1.8), angle=(0,scipy.pi/2,0)):
+def diode3(temp,place=(.8,0,1.8), angle=(0,old_div(scipy.pi,2),0)):
     pos = geometry.Origin(place,temp,angle=angle,flag=False)
     area = [1e-3,2.5e-4]
     centervec = geometry.Vecx(scipy.array((.815-.125,0,0))-place)
@@ -56,7 +59,7 @@ def diode3(temp,place=(.8,0,1.8), angle=(0,scipy.pi/2,0)):
     diodes[-1].redefine(temp)
     return diodes
 
-def diode4(temp,place=(1.5,0,-1.5), angle=(0,scipy.pi/2,0)):
+def diode4(temp,place=(1.5,0,-1.5), angle=(0,old_div(scipy.pi,2),0)):
     pos = geometry.Origin(place,temp,angle=angle,flag=False)
     area = [4e-3,3e-3]
     centervec = geometry.Vecx(scipy.array((.815-.4,0,-1.175))-place)
@@ -79,7 +82,7 @@ def diode5(center,ap=(2e-3,0,8e-2)):
     
       
     d = geometry.pts2Vec(pt2,pt1)
-    d.s = d.s/2
+    d.s = old_div(d.s,2)
     dnorm = geometry.cross(d,geometry.Vecx((0,0,1)))
     
     temp = geometry.Point((pt2.vec + d).x(),center)
@@ -118,7 +121,7 @@ def diode6(center,ap=(2.25e-2,0,8e-2),angler=(0,0,0)):
     
     
     d = geometry.pts2Vec(pt2,pt1)
-    d.s = d.s/2
+    d.s = old_div(d.s,2)
     dnorm = geometry.cross(d,geometry.Vecx((0,0,1)))
     
     temp = geometry.Point((pt2.vec + d).x(),center)
@@ -149,7 +152,7 @@ def diode6(center,ap=(2.25e-2,0,8e-2),angler=(0,0,0)):
     return diodes
 
 
-def diode7(temp,place=(1.5,0,1.3), angle=(0,scipy.pi/2,0)):
+def diode7(temp,place=(1.5,0,1.3), angle=(0,old_div(scipy.pi,2),0)):
     pos = geometry.Origin(place,temp,angle=angle,flag=False)
     area = [2e-3,.5e-3]
     centervec = geometry.Vecx(scipy.array((-1.,0,0)))
@@ -165,7 +168,7 @@ def diode7(temp,place=(1.5,0,1.3), angle=(0,scipy.pi/2,0)):
     diodes[-1].redefine(temp)
     return diodes
 
-def diode8(temp,place=(1.5,0,-1.3), angle=(0,scipy.pi/2,0)):
+def diode8(temp,place=(1.5,0,-1.3), angle=(0,old_div(scipy.pi,2),0)):
     pos = geometry.Origin(place,temp,angle=angle,flag=False)
     area = [2e-3,.5e-3]
     centervec = geometry.Vecx(scipy.array((-1.,0,0)))

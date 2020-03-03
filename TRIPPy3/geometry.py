@@ -1,3 +1,7 @@
+from __future__ import division
+from builtins import range
+from builtins import object
+from past.utils import old_div
 import scipy
 import warnings
 import copy
@@ -106,7 +110,7 @@ def Vecx(x_hat, s=None):
                 xin[1][temp] /= s[temp]
                 xin[2][temp] /= s[temp]
             except IndexError:
-                xin = scipy.where(s == 0, xin, xin/s)
+                xin = scipy.where(s == 0, xin, old_div(xin,s))
 
     return Vec(xin, s, flag=flag)
 
@@ -171,8 +175,8 @@ def Vecr(x_hat, s=None):
         #in the case that s is 0, avoid /0 problems
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore",category=RuntimeWarning)
-            xin[0] = scipy.where(s == 0, xin[0], xin[0]/s)
-            xin[2] = scipy.where(s == 0, xin[2], xin[2]/s)
+            xin[0] = scipy.where(s == 0, xin[0], old_div(xin[0],s))
+            xin[2] = scipy.where(s == 0, xin[2], old_div(xin[2],s))
             
     return Vec((xin[0]*scipy.cos(xin[1]),
                 xin[0]*scipy.sin(xin[1]),
@@ -362,7 +366,7 @@ class Vec(object):
             except ValueError:
                 temp = vec.unit.shape
                 return (self.s*vec.s)*scipy.dot(self.unit, 
-                                                vec.unit.reshape((3,vec.unit.size/3))).reshape(temp[1:])
+                                                vec.unit.reshape((3,old_div(vec.unit.size,3)))).reshape(temp[1:])
         except AttributeError:
             return Vec(self.unit, vec*self.s, flag=self.flag)
 
@@ -377,7 +381,7 @@ class Vec(object):
 
         """
 
-        return Vec(self.unit, self.s/val, flag=self.flag)
+        return Vec(self.unit, old_div(self.s,val), flag=self.flag)
 
     def __getitem__(self, idx):
         """coordinates at index, x.__getitem__(y) <==> x[y]
@@ -433,14 +437,14 @@ class Vec(object):
 
         except ValueError:
             shape = vec.unit.shape
-            temp = scipy.zeros((self.unit.size/3,3,3))
+            temp = scipy.zeros((old_div(self.unit.size,3),3,3))
             temp[...,0,1] = -self.unit[2].flatten()
             temp[...,0,2] = self.unit[1].flatten()
             temp[...,1,0] = -temp[...,0,1]
             temp[...,1,2] = -self.unit[0].flatten()
             temp[...,2,0] = -temp[...,0,2]
             temp[...,2,1] = -temp[...,1,2]
-            out = scipy.dot(temp,vec.unit.reshape((3,vec.unit.size/3)))
+            out = scipy.dot(temp,vec.unit.reshape((3,old_div(vec.unit.size,3))))
             out = out.reshape(shape)
             return out
 
@@ -590,7 +594,7 @@ class Vec(object):
         Args:
             angle: Singule element float or scipy array.
         """
-        temp = self.r0()/self.s
+        temp = old_div(self.r0(),self.s)
         angle = self.r1() + angle
         self.unit[0] = temp*scipy.cos(angle)
         self.unit[1] = temp*scipy.sin(angle)
@@ -643,7 +647,7 @@ def angle(Vec1, Vec2):
         on the plane defined by the two.
      
     """
-    return scipy.arccos((Vec1 * Vec2)/(Vec1.s * Vec2.s)) 
+    return scipy.arccos(old_div((Vec1 * Vec2),(Vec1.s * Vec2.s))) 
 
 def cross(Vec1, Vec2):
     """Returns angle between two vectors.
@@ -761,7 +765,7 @@ class Point(Vec):
         if len(shape) > 2:    
             sshape = self.s.shape
             self.s = self.s.flatten()
-            self.unit = self.unit.reshape(3,self.unit.size/3)
+            self.unit = self.unit.reshape(3,old_div(self.unit.size,3))
 
         # loop over the first 'path' of the current point
         temp = Vec(self.unit,self.s,flag=self.flag)
@@ -1216,7 +1220,7 @@ def fill(funtype, x0, x1, x2, *args, **kwargs):
 
     try:
         temp = []
-        for i in xrange(x0.shape[0]):
+        for i in range(x0.shape[0]):
             temp+= [fill(funtype,
                          x0[i],
                          x1[i],

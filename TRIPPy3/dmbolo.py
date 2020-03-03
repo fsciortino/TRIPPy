@@ -1,11 +1,12 @@
-import TRIPPy.surface
-import TRIPPy.beam
+from __future__ import division
+from __future__ import print_function
+from past.utils import old_div
+import TRIPPy3.surface
+import TRIPPy3.beam
 import scipy
-import eqtools
-#import TRIPPy.plot.mayaplot
+import eqtools3 as eqtools
 
-#data I found from /home/hutch/work/bolo/ this is horrid and there IS NO DOCUMENTATION
-# this is all I've been able to glean JESUS FUCKING CHRIST
+#data I found from /home/hutch/work/bolo/ -- NO DOCUMENTATION...
 
 def ap(plasma, loc=(1.03220,.198424,.00045),angle=(0.,0.,0.)):
     
@@ -16,7 +17,7 @@ def ap(plasma, loc=(1.03220,.198424,.00045),angle=(0.,0.,0.)):
     area = [.05*.0245,.52*.0245]
     return TRIPPy.surface.Rect(vloc1, plasma, area, vec=[meri,vloc2])
 
-def det(origin, angle=(0.,scipy.pi/2, 0.), loc=(0,0,.0245*.235), radius=50e-6):
+def det(origin, angle=(0.,old_div(scipy.pi,2), 0.), loc=(0,0,.0245*.235), radius=50e-6):
     return TRIPPy.surface.Circle(loc, origin, radius=radius, angle=angle) #actually a circular pinhole, but whatever
 
 def dmbolo(num, plasma):
@@ -28,7 +29,7 @@ def dmbolo(num, plasma):
                        [1.0305, 5.38974, .00545],
                        [1.02872, 6.11321, .00145]])
 
-    loc[:,1] -= scipy.pi/10
+    loc[:,1] -= old_div(scipy.pi,10)
 
     
     place = loc[num]
@@ -53,7 +54,7 @@ def volweight(num,numsplit=(3,3), factor=1, fact2=None, eq='/home/ian/python/g11
 
     out = scipy.zeros((len(rgrid)-1,len(zgrid)-1))
 
-    print(dmbolo2[0],dmbolo2[1])
+    print((dmbolo2[0],dmbolo2[1]))
 
     for i in surfs:
         for j in i:
@@ -75,11 +76,11 @@ def dmbolorays(num, plasma, avg=True):
     k = temp[1].edge()
 
     if avg:
-        inp1 = TRIPPy.Point((k[:,0]+k[:,1])/2.,plasma)
-        inp2 = TRIPPy.Point((k[:,2]+k[:,3])/2.,plasma)
+        inp1 = TRIPPy.Point(old_div((k[:,0]+k[:,1]),2.),plasma)
+        inp2 = TRIPPy.Point(old_div((k[:,2]+k[:,3]),2.),plasma)
     else:
-        inp1 = TRIPPy.Point((k[:,0]+k[:,3])/2.,plasma)
-        inp2 = TRIPPy.Point((k[:,1]+k[:,2])/2.,plasma)
+        inp1 = TRIPPy.Point(old_div((k[:,0]+k[:,3]),2.),plasma)
+        inp2 = TRIPPy.Point(old_div((k[:,1]+k[:,2]),2.),plasma)
 
     ray1 = TRIPPy.beam.Ray(temp[0],inp1)
     ray2 = TRIPPy.beam.Ray(temp[0],inp2)

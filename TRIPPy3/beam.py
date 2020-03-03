@@ -1,8 +1,13 @@
-import geometry
-import surface
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import range
+from past.utils import old_div
+from . import geometry
+from . import surface
 import scipy
 import scipy.linalg
-import _beam
+from . import _beam
 
 class Ray(geometry.Point):
     r"""Generates a ray vector object
@@ -150,7 +155,7 @@ class Ray(geometry.Point):
 
         sout = scipy.zeros(r.shape)
 
-        for i in xrange(len(params)):
+        for i in range(len(params)):
             temp = scipy.roots(params[i])
 
             # only positive real solutions are taken
@@ -259,18 +264,18 @@ class Beam(geometry.Origin):
         normal = geometry.pts2Vec(surf1, surf2)
         #orthogonal coordinates based off of connecting normal
 
-        snew = surf1.sagi - normal*((surf1.sagi * normal)*(surf1.sagi.s/normal.s))
-        mnew = surf1.meri - normal*((surf1.meri * normal)*(surf1.meri.s/normal.s))
+        snew = surf1.sagi - normal*((surf1.sagi * normal)*(old_div(surf1.sagi.s,normal.s)))
+        mnew = surf1.meri - normal*((surf1.meri * normal)*(old_div(surf1.meri.s,normal.s)))
         super(Beam, self).__init__(surf1, surf1._origin, vec=[mnew,normal])
         #calculate area at diode.
         self.sagi.s = snew.s
         a1 = surf1.area(snew.s,mnew.s)
 
         #calculate area at aperature
-        a2 = surf2.area((((self.sagi*surf2.sagi)/self.sagi.s)**2
-                         + ((self.meri*surf2.sagi)/self.meri.s)**2)**.5,
-                        (((self.sagi*surf2.meri)/self.sagi.s)**2 
-                         + ((self.meri*surf2.meri)/self.meri.s)**2)**.5)
+        a2 = surf2.area(((old_div((self.sagi*surf2.sagi),self.sagi.s))**2
+                         + (old_div((self.meri*surf2.sagi),self.meri.s))**2)**.5,
+                        ((old_div((self.sagi*surf2.meri),self.sagi.s))**2 
+                         + (old_div((self.meri*surf2.meri),self.meri.s))**2)**.5)
 
         #generate etendue
         self.etendue = a1*a2/(normal.s ** 2)
@@ -388,7 +393,7 @@ class Beam(geometry.Origin):
 
         sout = scipy.zeros(r.shape)
 
-        for i in xrange(len(params)):
+        for i in range(len(params)):
             temp = scipy.roots(params[i])
 
             # only positive real solutions are taken
@@ -469,10 +474,10 @@ class subBeam(Beam):
         if split2 is None:
             split2 = [1,1]
 
-        ins1 = float((split1[0]-1))/split1[0]
-        inm1 = float((split1[1]-1))/split1[1]
-        ins2 = float((split2[0]-1))/split2[0]
-        inm2 = float((split2[1]-1))/split2[1] 
+        ins1 = old_div(float((split1[0]-1)),split1[0])
+        inm1 = old_div(float((split1[1]-1)),split1[1])
+        ins2 = old_div(float((split2[0]-1)),split2[0])
+        inm2 = old_div(float((split2[1]-1)),split2[1]) 
 
         grid = scipy.meshgrid(surf1.sagi.s*scipy.linspace(-ins1,
                                                            ins1,
@@ -499,8 +504,8 @@ class subBeam(Beam):
         self.unit = surf1cents.unit
         #orthogonal coordinates based off of connecting normal
 
-        self.sagi = surf1.sagi - self.norm*((surf1.sagi * self.norm)*(surf1.sagi.s/self.norm.s))
-        self.meri = surf1.meri - self.norm*((surf1.meri * self.norm)*(surf1.meri.s/self.norm.s))
+        self.sagi = surf1.sagi - self.norm*((surf1.sagi * self.norm)*(old_div(surf1.sagi.s,self.norm.s)))
+        self.meri = surf1.meri - self.norm*((surf1.meri * self.norm)*(old_div(surf1.meri.s,self.norm.s)))
         
         #reduce calcuations in calling super to inherited classes
         self._origin = surf1._origin
@@ -513,10 +518,10 @@ class subBeam(Beam):
         a1 = surf1.area(self.sagi.s,self.meri.s)
 
         #calculate area at aperature
-        a2 = surf2.area((((self.sagi*surf2.sagi)/self.sagi.s)**2
-                         + ((self.meri*surf2.sagi)/self.meri.s)**2)**.5,
-                        (((self.sagi*surf2.meri)/self.sagi.s)**2 
-                         + ((self.meri*surf2.meri)/self.meri.s)**2)**.5)/(split2[0]*split2[1])
+        a2 = old_div(surf2.area(((old_div((self.sagi*surf2.sagi),self.sagi.s))**2
+                         + (old_div((self.meri*surf2.sagi),self.meri.s))**2)**.5,
+                        ((old_div((self.sagi*surf2.meri),self.sagi.s))**2 
+                         + (old_div((self.meri*surf2.meri),self.meri.s))**2)**.5),(split2[0]*split2[1]))
 
         #generate etendue
         self.etendue = a1*a2/(self.norm.s ** 2)
@@ -529,9 +534,9 @@ class subBeam(Beam):
 
         self.etendue = self.etendue.ravel()
         self.s = self.s.ravel()
-        self.unit = self.unit.reshape((3,self.unit.size/3))
+        self.unit = self.unit.reshape((3,old_div(self.unit.size,3)))
         self.norm.s = self.norm.s.ravel()
-        self.norm.unit = self.unit.reshape((3,self.norm.unit.size/3))
+        self.norm.unit = self.unit.reshape((3,old_div(self.norm.unit.size,3)))
 
     def reshape(self):
         raise NotImplementedError(' not yet')
@@ -733,12 +738,12 @@ def _genBFEdgeZero(plasma, zeros, rcent, zcent):
     cent = geometry.Point(geometry.Vecr([rcent,0,zcent]),plasma)
     zerobeam = []
     outline = []
-    for i in xrange(len(plasma.norm.s)-1):
+    for i in range(len(plasma.norm.s)-1):
         outline += [geometry.Vecx([plasma.sagi.s[i],
                                    0,
                                    plasma.norm.s[i]])-cent]
         
-    for i in xrange(zeros):
+    for i in range(zeros):
         temp2 = geometry.Vecr([scipy.cos(theta[i]),
                                0,
                                scipy.sin(theta[i])])
@@ -779,7 +784,7 @@ def pos2Ray(pos, tokamak, angle=None, eps=1e-6):
     phi = scipy.array(pos[3])
 
     zt = z1 - scipy.tan(phi)*scipy.sqrt(r1**2 - rt**2)
-    angle2  = scipy.arccos(rt/r1)
+    angle2  = scipy.arccos(old_div(rt,r1))
 
     if angle is None:
         angle = scipy.zeros(r1.shape)

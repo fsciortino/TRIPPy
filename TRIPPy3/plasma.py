@@ -1,7 +1,15 @@
-import geometry,scipy,eqtools
-import surface
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import range
+from . import geometry
+import scipy
+try:
+    import eqtools3 as eqtools
+except:
+    import eqtools
+from . import surface
 import scipy.linalg
-import _beam
+from . import _beam
 
 class Tokamak(geometry.Center):
     """Tokamak object for handling geometry and equilibria.
@@ -99,7 +107,7 @@ class Tokamak(geometry.Center):
             # This is used when the actual plasma vessel structure is not as described in the eqdsk
             # example being the Limiter on Alcator C-Mod, which then keys to neglect an intersection,
             # and look for the next as the true wall intersection.
-            for i in xrange(limiter):
+            for i in range(limiter):
                 intersect = _beam.interceptCyl(scipy.atleast_2d(ray.x()[:,-1]),
                                                scipy.atleast_2d(ray.norm.unit),
                                                self.meri.s,

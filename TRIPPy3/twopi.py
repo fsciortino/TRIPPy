@@ -1,10 +1,10 @@
-import TRIPPy.surface
+from __future__ import division
+from past.utils import old_div
+import TRIPPy3.surface
 import scipy
-import eqtools
-#import TRIPPy.plot.mayaplot
+import eqtools3 as eqtools
 
-#data I found from /home/hutch/work/bolo/ this is horrid and there IS NO DOCUMENTATION
-# this is all I've been able to glean JESUS FUCKING CHRIST
+#data I found from /home/hutch/work/bolo/ -- NO DOCUMENTATION...
 
 def det(origin,ang1=120.,ang2=150.,offset=1e-3,angle=(0.,0.,0.)):
     
@@ -13,10 +13,10 @@ def det(origin,ang1=120.,ang2=150.,offset=1e-3,angle=(0.,0.,0.)):
     area = [2*offset*scipy.tan(ang1*scipy.pi/360.),2*offset*scipy.tan(ang2*scipy.pi/360.)]
     return TRIPPy.surface.Rect((0.,0.,-offset), origin, area, angle=angle)
 
-def ap(plasma, angle=(0., scipy.pi/3, 0.), loc=(.922,0,-.261), area=scipy.pi*pow(5e-5,2)):
+def ap(plasma, angle=(0., old_div(scipy.pi,3), 0.), loc=(.922,0,-.261), area=scipy.pi*pow(5e-5,2)):
     return TRIPPy.surface.Rect(loc,plasma,area=[scipy.sqrt(area),scipy.sqrt(area)],angle=angle) #actually a circular pinhole, but whatever
 
-def twopi(plasma,angle=(0.,scipy.pi/3,0.),loc=(.922,0,-.261),area=scipy.pi*pow(5e-5,2)):
+def twopi(plasma,angle=(0.,old_div(scipy.pi,3),0.),loc=(.922,0,-.261),area=scipy.pi*pow(5e-5,2)):
     apin = ap(plasma,angle=angle,loc=loc,area=area)
     temp = det(apin)
     temp.redefine(plasma)

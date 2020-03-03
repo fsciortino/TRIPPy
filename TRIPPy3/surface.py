@@ -1,7 +1,12 @@
-import geometry
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import range
+from past.utils import old_div
+from . import geometry
 import scipy
 import scipy.linalg
-import _beam
+from . import _beam
 
 edges = scipy.array(([-1,-1],
                      [-1, 1],
@@ -114,8 +119,8 @@ class Surf(geometry.Origin):
             flag = ref.flag
 
         super(Surf,self).__init__(x_hat, ref, vec=vec, angle=angle, flag=flag)
-        self.sagi.s = scipy.atleast_1d(area[0])/2
-        self.meri.s = scipy.atleast_1d(area[1])/2 
+        self.sagi.s = old_div(scipy.atleast_1d(area[0]),2)
+        self.meri.s = old_div(scipy.atleast_1d(area[1]),2) 
         # this utilizes an unused attribute of the geometry.Origin where 
         #the length of the defining coordinate system unit vectors are used
         #to define the cross sectional area of the surface, and the norm is
@@ -274,10 +279,10 @@ class Rect(Surf):
         """ utilizes geometry.grid to change the rectangle into a generalized surface,
         it is specified with a single set of basis vectors to describe the meridonial,
         normal, and sagittal planes."""
-        ins = float((sagi - 1))/sagi
-        inm = float((meri - 1))/meri
-        stemp = self.sagi.s/sagi
-        mtemp = self.meri.s/meri
+        ins = old_div(float((sagi - 1)),sagi)
+        inm = old_div(float((meri - 1)),meri)
+        stemp = old_div(self.sagi.s,sagi)
+        mtemp = old_div(self.meri.s,meri)
 
         self.sagi.s,self.meri.s = scipy.meshgrid(scipy.linspace(-self.sagi.s*ins,
                                                                  self.sagi.s*ins,
@@ -402,8 +407,8 @@ class Cyl(Surf):
             flag = ref.flag
 
         super(Surf,self).__init__(x_hat, ref, vec=vec, angle=angle, flag=flag)
-        self.norm.s = scipy.atleast_1d(area[0])/2
-        self.meri.s = scipy.atleast_1d(area[1])/2 
+        self.norm.s = old_div(scipy.atleast_1d(area[0]),2)
+        self.meri.s = old_div(scipy.atleast_1d(area[1]),2) 
 
         if self.meri.s > scipy.pi:
             raise ValueError('angle of cylinder can only be < 2*pi')
@@ -479,10 +484,10 @@ class Cyl(Surf):
         if pts%2 == 1:
             raise ValueError('pts must be an even number')
             
-        theta = scipy.linspace(-self.meri.s, self.meri.s, pts/2.)
+        theta = scipy.linspace(-self.meri.s, self.meri.s, old_div(pts,2.))
         theta = scipy.concatenate([theta,theta[::-1]])
         z = self.norm.s*scipy.ones((pts,))
-        z[pts/2:] = z[pts/2:] - 2*self.norm.s
+        z[old_div(pts,2):] = z[old_div(pts,2):] - 2*self.norm.s
         
         temp = geometry.Point(geometry.Vecr((self.sagi.s*scipy.ones((pts,)),
                                             theta,
@@ -506,10 +511,10 @@ class Cyl(Surf):
         """ utilizes geometry.grid to change the rectangle into a generalized surface,
         it is specified with a single set of basis vectors to describe the meridonial,
         normal, and sagittal planes."""
-        ins = float((sagi - 1))/sagi
-        inm = float((meri - 1))/meri
-        stemp = self.norm.s/sagi
-        mtemp = self.meri.s/meri
+        ins = old_div(float((sagi - 1)),sagi)
+        inm = old_div(float((meri - 1)),meri)
+        stemp = old_div(self.norm.s,sagi)
+        mtemp = old_div(self.meri.s,meri)
 
         z,theta = scipy.meshgrid(scipy.linspace(-self.norm.s*ins,
                                                 self.norm.s*ins,
@@ -519,7 +524,7 @@ class Cyl(Surf):
                                                 meri))
 
         vecin =geometry.Vecr((self.sagi.s*scipy.ones(theta.shape),
-                              theta+scipy.pi/2,
+                              theta+old_div(scipy.pi,2),
                               scipy.zeros(theta.shape))) #this produces an artificial
         # meri vector, which is in the 'y_hat' direction in the space of the cylinder
         # This is a definite patch over the larger problem, where norm is not normal
@@ -539,10 +544,10 @@ class Cyl(Surf):
 
         out = []
         #this for loop makes me cringe super hard
-        for i in xrange(meri):
+        for i in range(meri):
             try:
                 temp = []
-                for j in xrange(sagi):
+                for j in range(sagi):
                     inp = self.rot(vecin[i][j])
                     temp += [Cyl(geometry.Vecx(x_hat.x()[:,i,j]),
                                  self._origin,
@@ -573,10 +578,10 @@ class Cyl(Surf):
     
     def pixelate(self, sagi, meri):
         """ convert surface into number of rectangular surfaces"""
-        ins = float((sagi - 1))/sagi
-        inm = float((meri - 1))/meri
-        stemp = self.norm.s/sagi
-        mtemp = self.meri.s/meri
+        ins = old_div(float((sagi - 1)),sagi)
+        inm = old_div(float((meri - 1)),meri)
+        stemp = old_div(self.norm.s,sagi)
+        mtemp = old_div(self.meri.s,meri)
 
         z,theta = scipy.meshgrid(scipy.linspace(-self.norm.s*ins,
                                                 self.norm.s*ins,
@@ -586,7 +591,7 @@ class Cyl(Surf):
                                                 meri))
 
         vecin = geometry.Vecr((self.sagi.s*scipy.ones(theta.shape),
-                               theta+scipy.pi/2,
+                               theta+old_div(scipy.pi,2),
                                scipy.zeros(theta.shape))) #this produces an artificial
         # meri vector, which is in the 'y_hat' direction in the space of the cylinder
         # This is a definite patch over the larger problem, where norm is not normal
@@ -606,10 +611,10 @@ class Cyl(Surf):
 
         out = []
         #this for loop makes me cringe super hard
-        for i in xrange(meri):
+        for i in range(meri):
             try:
                 temp = []
-                for j in xrange(sagi):
+                for j in range(sagi):
                     inp = self.rot(vecin[i][j])
                     temp += [Rect(geometry.Vecx(x_hat.x()[:,i,j]),
                                   self._origin,
@@ -747,7 +752,7 @@ class Ellipse(Surf):
         return scipy.pi*sagi*meri
 
     def edgetest(self, meri, sagi):
-        if (meri/self.meri)**2+(sagi/self.sagi)**2 <= 1:
+        if (old_div(meri,self.meri))**2+(old_div(sagi,self.sagi))**2 <= 1:
             return True
         else:
             return False

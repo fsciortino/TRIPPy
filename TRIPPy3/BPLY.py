@@ -1,6 +1,12 @@
-import AXUV
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import str
+from builtins import range
+from past.utils import old_div
+from . import AXUV
 import surface, geometry, scipy
-import beam as beamin
+from . import beam as beamin
 import scipy.interpolate
 import matplotlib.pyplot as plt
 import time
@@ -9,7 +15,7 @@ import MDSplus
 import gc
 import plasma, eqtools
 
-def BPLY(temp, place=(1.87,0,.157277), angle=(0,.17453+scipy.pi/2,-1.62385+scipy.pi/2)):
+def BPLY(temp, place=(1.87,0,.157277), angle=(0,.17453+old_div(scipy.pi,2),-1.62385+old_div(scipy.pi,2))):
 
     pos = geometry.Origin(place, temp, angle=angle)
     area = [4e-3,3e-3]
@@ -44,7 +50,7 @@ def getBeamFluxSpline(beam,plasma,t,lim1,lim2,points = 1000):
     print(time.time()-h)
     outspline = len(t)*[0]
     inspline = len(t)*[0]
-    for i in xrange(t.size):
+    for i in range(t.size):
         temp = lim1
         mask = scipy.logical_and(scipy.isfinite(psi[i]),psi[i] < lim2+.02)
 
@@ -90,7 +96,7 @@ def calcArea(points):
     val = 0 
     for i in scipy.arange(len(points))-1:
         val += points[i][0]*points[i+1][1] - points[i][1]*points[i+1][0]
-    return abs(val/2)
+    return abs(old_div(val,2))
 
 def viewPoints(surf1,surf2,plasma,t,lim1 = .88,lim2 = .92,fillorder = True):
     h=time.time()
@@ -121,14 +127,14 @@ def viewPoints(surf1,surf2,plasma,t,lim1 = .88,lim2 = .92,fillorder = True):
     #print(top)
 
     #condition inputs for area calculations
-    for i in xrange(t.size):
+    for i in range(t.size):
         output[i] = []
         #segment = 3*[0]
         #beam and ray masking values are already written to their norm.s values
 #        segment[0] = scipy.array([outertop[i][1],outertop[i][0],innertop[i][0],innertop[i][1]])
 #        segment[1] = scipy.array([outermid[i][1],outermid[i][0],innermid[i][0],innermid[i][1]])
 #        segment[2] = scipy.array([outerbot[i][1],outerbot[i][0],innerbot[i][0],innerbot[i][1]])
-        for j in xrange(2):
+        for j in range(2):
             temp = []
             if scipy.any(mid[j][i]):
                 for k,ray in (mid[j][i],beam),(top[j][i],ray1),(bot[j][i],ray2):
@@ -180,7 +186,7 @@ def effectiveHeight(surf1, surf2, plasma, t, lim1=.88, lim2=.92):
 
     segments = viewPoints(surf1,surf2,plasma,t,lim1=lim1,lim2=lim2,fillorder=False)
     output = scipy.zeros((len(segments),))
-    for i in xrange(len(segments)):
+    for i in range(len(segments)):
         area = 0
         if not scipy.all(segments[i] == []):
             
@@ -188,7 +194,7 @@ def effectiveHeight(surf1, surf2, plasma, t, lim1=.88, lim2=.92):
             outlen = geometry.pts2Vec(segments[i][1][0][0],segments[i][1][0][1])
 
  
-            for j in xrange(len(segments[i])): # loop over in vs out
+            for j in range(len(segments[i])): # loop over in vs out
 
                 temp = []
                 for k in segments[i][j]: # loop over number of 'rays'
@@ -196,7 +202,7 @@ def effectiveHeight(surf1, surf2, plasma, t, lim1=.88, lim2=.92):
                         temp += [l.x()[[0,2]]]
                 temp = scipy.array(temp)
         #delaunay
-                for k in xrange((len(temp)-2)/2):
+                for k in range(old_div((len(temp)-2),2)):
                     y = temp[[0,1,2*(k+1),2*(k+1)+1]]
                     if not(scipy.all([y[0] == y[1],y[2] == y[3]])):
                         tri = scipy.spatial.Delaunay(y) #divide into a lower and upper section
@@ -206,7 +212,7 @@ def effectiveHeight(surf1, surf2, plasma, t, lim1=.88, lim2=.92):
                             area += calcArea(l)
 
 
-                output[i] = area/(inlen.s + outlen.s)               
+                output[i] = old_div(area,(inlen.s + outlen.s))               
     #plt.show()
     return output
 

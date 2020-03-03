@@ -1,3 +1,4 @@
+from builtins import range
 import beam,geometry,scipy
 import MDSplus,invert
 
@@ -22,7 +23,7 @@ def Chords(plasma):
                            -8.4525,
                            -12.6703,
                            -17.1035])
-    for i in xrange(16):
+    for i in range(16):
         output += [beam.Ray(geometry.Point((r2[i],0.,z2[i]),plasma),
                            geometry.Point((r1[i],0.,z1[i]),plasma))]
     return output
