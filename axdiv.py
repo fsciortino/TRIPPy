@@ -1,10 +1,10 @@
 from __future__ import print_function
 from __future__ import absolute_import
-import TRIPPy3.surface
-import TRIPPy3 as TRIPPy
+import TRIPPy.surface
+import TRIPPy
 from . import AXUV
 import scipy
-import eqtools3 as eqtools
+import eqtools
 
 
 #data I found from /home/hutch/work/bolo/ this is horrid and there IS NO DOCUMENTATION

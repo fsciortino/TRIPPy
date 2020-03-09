@@ -1,10 +1,10 @@
 from __future__ import division
 from __future__ import print_function
 from past.utils import old_div
-import TRIPPy3.surface
-import TRIPPy3.beam
+import TRIPPy.surface
+import TRIPPy.beam
 import scipy
-import eqtools3 as eqtools
+import eqtools
 
 #data I found from /home/hutch/work/bolo/ -- NO DOCUMENTATION...
 

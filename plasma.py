@@ -4,7 +4,7 @@ from builtins import range
 from . import geometry
 import scipy
 try:
-    import eqtools3 as eqtools
+    import eqtools
 except:
     import eqtools
 from . import surface

@@ -1,8 +1,8 @@
 from __future__ import division
 from past.utils import old_div
-import TRIPPy3.surface
+import TRIPPy.surface
 import scipy
-import eqtools3 as eqtools
+import eqtools
 
 #data I found from /home/hutch/work/bolo/ -- NO DOCUMENTATION...
 
